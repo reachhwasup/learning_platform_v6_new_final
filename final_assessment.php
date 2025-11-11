@@ -485,7 +485,7 @@ html {
     background: rgba(0, 0, 0, 0.7);
     display: none;
     align-items: center;
-    justify-center;
+    justify-content: center;
     z-index: 9999;
 }
 
