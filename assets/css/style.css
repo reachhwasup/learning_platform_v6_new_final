@@ -1,0 +1,111 @@
+/*
+File: /assets/css/style.css (FINAL & COMPLETE)
+Description: This file contains all necessary styles for the entire platform.
+*/
+
+/* --- Base Styles & Variables --- */
+:root {
+    --primary-color: #0052cc;
+    --primary-dark: #0041a3;
+    --secondary-color: #f4f5f7;
+    --accent-color: #ffab00;
+    --light-gray: #f3f4f6;
+    --medium-gray: #e5e7eb;
+    --dark-gray: #1f2937;
+    --success-color: #16a34a;
+    --error-color: #dc2626;
+    --font-family: 'Inter', sans-serif;
+}
+
+/* --- Welcome Banner --- */
+.welcome-banner {
+    position: relative;
+    height: 250px;
+    background-image: url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.welcome-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 40, 85, 0.7);
+    border-radius: 0.5rem;
+}
+
+.welcome-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Search Container --- */
+.search-container {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -80px;
+    position: relative;
+    z-index: 2;
+}
+
+/* --- View Switcher and List View --- */
+.view-switcher {
+    display: inline-flex;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+}
+
+.view-btn {
+    padding: 0.5rem;
+    background-color: #fff;
+    color: #6b7280;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.view-btn:first-child {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+}
+
+.view-btn:last-child {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+.view-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.view-btn.active {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.module-row {
+    transition: box-shadow 0.2s ease-in-out;
+}
+.module-row:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+/* --- JS Helper .hidden --- */
+.module-card.hidden {
+    display: none !important;
+}
