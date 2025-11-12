@@ -305,27 +305,27 @@ try {
 
             <div class="space-y-1">
                 <!-- Dashboard -->
-                <a href="dashboard.php" class="nav-item flex items-center px-4 py-3 rounded-xl transition-all duration-300 group <?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active-nav' : '' ?>">
+                <a href="dashboard.php" class="nav-item flex items-center px-4 py-3 rounded-xl transition-all duration-300 group <?= htmlspecialchars(basename($_SERVER['PHP_SELF']), ENT_QUOTES, 'UTF-8') == 'dashboard.php' ? 'active-nav' : '' ?>">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mr-4">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
                     </div>
                     <span class="font-semibold" style="color: #ffffff !important; font-weight: 600 !important;">Dashboard</span>
-                    <?php if (basename($_SERVER['PHP_SELF']) == 'dashboard.php'): ?>
+                    <?php if (htmlspecialchars(basename($_SERVER['PHP_SELF']), ENT_QUOTES, 'UTF-8') == 'dashboard.php'): ?>
                         <div class="ml-auto w-2 h-2 bg-yellow-400 rounded-full nav-badge"></div>
                     <?php endif; ?>
                 </a>
 
                 <!-- Help & Support -->
-                <a href="help_support.php" class="nav-item flex items-center px-4 py-3 rounded-xl transition-all duration-300 group <?= basename($_SERVER['PHP_SELF']) == 'help_support.php' ? 'active-nav' : '' ?>">
+                <a href="help_support.php" class="nav-item flex items-center px-4 py-3 rounded-xl transition-all duration-300 group <?= htmlspecialchars(basename($_SERVER['PHP_SELF']), ENT_QUOTES, 'UTF-8') == 'help_support.php' ? 'active-nav' : '' ?>">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center mr-4">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
                     <span class="font-semibold" style="color: #ffffff !important; font-weight: 600 !important;">Help & Support</span>
-                    <?php if (basename($_SERVER['PHP_SELF']) == 'help_support.php'): ?>
+                    <?php if (htmlspecialchars(basename($_SERVER['PHP_SELF']), ENT_QUOTES, 'UTF-8') == 'help_support.php'): ?>
                         <div class="ml-auto w-2 h-2 bg-yellow-400 rounded-full nav-badge"></div>
                     <?php endif; ?>
                 </a>
@@ -356,13 +356,13 @@ try {
                     $assessment_classes .= "";
                 }
                 
-                if (basename($_SERVER['PHP_SELF']) == 'final_assessment.php') {
+                if (htmlspecialchars(basename($_SERVER['PHP_SELF']), ENT_QUOTES, 'UTF-8') == 'final_assessment.php') {
                     $assessment_classes .= " active-nav";
                 }
                 ?>
                 
                 <div class="relative group">
-                    <a href="<?= $assessment_link ?>" class="<?= $assessment_classes ?>" 
+                    <a href="<?= htmlspecialchars($assessment_link, ENT_QUOTES, 'UTF-8') ?>" class="<?= htmlspecialchars($assessment_classes, ENT_QUOTES, 'UTF-8') ?>" 
                        <?= !$sidebar_can_take_assessment ? 'onclick="showAssessmentTooltip(event)"' : '' ?>>
                         <div class="w-10 h-10 rounded-xl <?= $sidebar_has_passed ? 'bg-gradient-to-br from-green-500 to-emerald-600' : ($sidebar_can_take_assessment ? 'bg-gradient-to-br from-yellow-500 to-orange-500' : 'bg-gradient-to-br from-gray-500 to-gray-600') ?> flex items-center justify-center mr-4">
                             <?php if ($sidebar_has_passed): ?>
@@ -393,7 +393,7 @@ try {
                                 <div class="text-xs text-yellow-300 mt-1 font-medium">Ready to take!</div>
                             <?php endif; ?>
                         </div>
-                        <?php if (basename($_SERVER['PHP_SELF']) == 'final_assessment.php'): ?>
+                        <?php if (htmlspecialchars(basename($_SERVER['PHP_SELF']), ENT_QUOTES, 'UTF-8') == 'final_assessment.php'): ?>
                             <div class="ml-2 w-2 h-2 bg-yellow-400 rounded-full nav-badge"></div>
                         <?php endif; ?>
                     </a>
