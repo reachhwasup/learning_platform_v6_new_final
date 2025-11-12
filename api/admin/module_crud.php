@@ -223,8 +223,22 @@ try {
                     }
                     
                     $thumbnail_file = $_FILES['thumbnail_file'];
+                    
+                    // Validate file type using MIME
+                    $allowed_thumb_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!validate_file_type($thumbnail_file['tmp_name'], $allowed_thumb_types)) {
+                        $response = ['success' => false, 'message' => 'Invalid thumbnail file type. Only JPEG, PNG, GIF, and WEBP are allowed.'];
+                        break;
+                    }
+                    
+                    // Check file size (5MB limit for thumbnails)
+                    if ($thumbnail_file['size'] > 5 * 1024 * 1024) {
+                        $response = ['success' => false, 'message' => 'Thumbnail file size exceeds 5MB limit.'];
+                        break;
+                    }
+                    
                     $thumb_ext = pathinfo($thumbnail_file['name'], PATHINFO_EXTENSION);
-                    $thumb_filename = 'thumb_' . $module_id . '_' . time() . '.' . $thumb_ext;
+                    $thumb_filename = secure_filename('thumb_' . $module_id . '_' . time() . '.' . $thumb_ext);
                     $thumbnail_path = $thumbnail_dir . $thumb_filename;
                     
                     if (move_uploaded_file($thumbnail_file['tmp_name'], $thumbnail_path)) {
