@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (Exception $e) {
             if ($pdo->inTransaction()) $pdo->rollBack();
             error_log("Import Error: " . $e->getMessage());
-            $response['message'] = 'An error occurred during import: ' . $e->getMessage();
+            $response['message'] = 'An error occurred during import. Please check the file format and try again.';
         }
         
         echo json_encode($response);
@@ -215,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
         error_log($e->getMessage());
-        $response['message'] = 'A server error occurred: ' . $e->getMessage();
+        $response['message'] = 'A server error occurred. Please try again or contact support.';
     }
 }
 

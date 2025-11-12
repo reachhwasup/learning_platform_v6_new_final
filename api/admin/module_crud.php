@@ -295,7 +295,7 @@ try {
     }
 } catch (PDOException | Exception $e) {
     error_log($e->getMessage());
-    $response['message'] = 'A server error occurred: ' . $e->getMessage();
+    $response['message'] = 'A server error occurred. Please try again or contact support.';
 }
 
 echo json_encode($response);

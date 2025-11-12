@@ -115,7 +115,8 @@ try {
             break;
     }
 } catch (Exception $e) {
-    $response['message'] = $e->getMessage();
+    error_log("Update Profile Error: " . $e->getMessage());
+    $response['message'] = 'An error occurred while updating profile. Please try again.';
 }
 
 echo json_encode($response);

@@ -87,8 +87,8 @@ try {
 
 } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    $response['message'] = $e->getMessage();
-    error_log($e->getMessage());
+    error_log("Submit Quiz Error: " . $e->getMessage());
+    $response['message'] = 'An error occurred while submitting the quiz. Please try again.';
 }
 
 echo json_encode($response);

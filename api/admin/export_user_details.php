@@ -179,7 +179,7 @@ try {
 
 } catch (PDOException $e) {
     error_log("Export User Details Error: " . $e->getMessage());
-    die('A database error occurred while generating the report. Details: ' . $e->getMessage());
+    die('A database error occurred while generating the report. Please contact support.');
 }
 
 // --- Create Spreadsheet ---

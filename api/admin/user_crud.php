@@ -313,7 +313,8 @@ try {
     $response['message'] = 'A database error occurred. Please check the logs.';
 } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    $response['message'] = $e->getMessage();
+    error_log($e->getMessage());
+    $response['message'] = 'An error occurred. Please try again or contact support.';
 }
 
 echo json_encode($response);
