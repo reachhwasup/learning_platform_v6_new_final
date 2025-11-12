@@ -44,6 +44,29 @@ document.addEventListener('DOMContentLoaded', () => {
             openModal();
         });
 
+        // Empty state "Create First Module" button
+        const addBtnEmpty = document.getElementById('add-module-btn-empty');
+        console.log('Empty button found:', addBtnEmpty); // Debug log
+        if (addBtnEmpty) {
+            console.log('Adding click listener to empty state button'); // Debug log
+            addBtnEmpty.addEventListener('click', () => {
+                console.log('Empty state button clicked!'); // Debug log
+                form.reset();
+                document.getElementById('modal-title').textContent = 'Add New Module';
+                document.getElementById('form-action').value = 'add_module';
+                document.getElementById('module_id').value = '';
+                document.getElementById('video_duration').value = '';
+                document.getElementById('video_file').required = true;
+                const videoSection = document.getElementById('video-section');
+                if (videoSection) videoSection.style.display = 'block';
+                const videoInfo = document.getElementById('current-video-info');
+                if (videoInfo) videoInfo.remove();
+                openModal();
+            });
+        } else {
+            console.log('Empty state button NOT found in DOM'); // Debug log
+        }
+
         cancelBtn.addEventListener('click', closeModal);
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
 

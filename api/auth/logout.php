@@ -12,7 +12,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 2. Unset all of the session variables.
+// 2. Check if user is admin before destroying session
+$isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+
+// 3. Unset all of the session variables.
 $_SESSION = array();
 
 // 3. If it's desired to kill the session, also delete the session cookie.
@@ -28,8 +31,12 @@ if (ini_get("session.use_cookies")) {
 // 4. Finally, destroy the session.
 session_destroy();
 
-// 5. Redirect to the login page.
-// The path is relative to this file's location (`/api/auth/`).
-header("Location: ../../login.php");
+// 5. Redirect to the appropriate login page based on user role.
+// Admins go to admin login, regular users go to user login.
+if ($isAdmin) {
+    header("Location: ../../admin/login.php");
+} else {
+    header("Location: ../../login.php");
+}
 exit(); // Ensure no further code is executed after redirection.
 ?>
