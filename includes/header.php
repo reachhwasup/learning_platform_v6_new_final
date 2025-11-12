@@ -17,7 +17,7 @@ $page_names = [
     'profile' => 'My Profile',
     'final_assessment' => 'Final Assessment'
 ];
-$current_page_name = $page_names[$current_page] ?? ucfirst(str_replace('_', ' ', $current_page));
+$current_page_name = htmlspecialchars($page_names[$current_page] ?? ucfirst(str_replace('_', ' ', $current_page)), ENT_QUOTES, 'UTF-8');
 ?>
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-50">
@@ -117,6 +117,9 @@ $current_page_name = $page_names[$current_page] ?? ucfirst(str_replace('_', ' ',
             }
         }
     </style>
+    
+    <!-- Security Script - Prevent Code Inspection -->
+    <script src="assets/js/security.js?v=<?= time() ?>"></script>
 </head>
 <body class="h-full bg-gradient-to-br from-gray-50 to-blue-50" style="overflow-x: hidden;">
     <?php require_once 'user_sidebar.php'; ?>

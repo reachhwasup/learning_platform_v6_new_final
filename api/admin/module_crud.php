@@ -50,10 +50,23 @@ try {
             if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
             if (!is_dir($thumbnail_dir)) mkdir($thumbnail_dir, 0755, true);
 
-            // Upload video file
+            // Validate video file MIME type
             $video_file = $_FILES['video_file'];
+            $allowed_video_types = ['video/mp4', 'video/x-msvideo', 'video/quicktime', 'video/x-matroska'];
+            
+            if (!validate_file_type($video_file['tmp_name'], $allowed_video_types)) {
+                throw new Exception('Invalid video file type. Only MP4, AVI, MOV, and MKV are allowed.');
+            }
+            
+            // Validate video file size (max 500MB)
+            $max_video_size = 500 * 1024 * 1024; // 500MB
+            if ($video_file['size'] > $max_video_size) {
+                throw new Exception('Video file size too large. Maximum size is 500MB.');
+            }
+
+            // Upload video file with secure filename
             $video_ext = pathinfo($video_file['name'], PATHINFO_EXTENSION);
-            $video_filename = 'video_' . $module_id . '_' . time() . '.' . $video_ext;
+            $video_filename = secure_filename('video_' . $module_id . '_' . time() . '.' . $video_ext);
             $video_path = $upload_dir . $video_filename;
 
             if (!move_uploaded_file($video_file['tmp_name'], $video_path)) {
@@ -65,8 +78,21 @@ try {
             $thumb_filename = null;
             if (!empty($_FILES['thumbnail_file']['name'])) {
                 $thumbnail_file = $_FILES['thumbnail_file'];
+                
+                // Validate thumbnail MIME type
+                $allowed_image_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validate_file_type($thumbnail_file['tmp_name'], $allowed_image_types)) {
+                    throw new Exception('Invalid thumbnail file type. Only JPEG, PNG, GIF, and WEBP are allowed.');
+                }
+                
+                // Validate thumbnail file size (max 5MB)
+                $max_thumb_size = 5 * 1024 * 1024; // 5MB
+                if ($thumbnail_file['size'] > $max_thumb_size) {
+                    throw new Exception('Thumbnail file size too large. Maximum size is 5MB.');
+                }
+                
                 $thumb_ext = pathinfo($thumbnail_file['name'], PATHINFO_EXTENSION);
-                $thumb_filename = 'thumb_' . $module_id . '_' . time() . '.' . $thumb_ext;
+                $thumb_filename = secure_filename('thumb_' . $module_id . '_' . time() . '.' . $thumb_ext);
                 $thumbnail_path = $thumbnail_dir . $thumb_filename;
                 
                 if (!move_uploaded_file($thumbnail_file['tmp_name'], $thumbnail_path)) {
@@ -145,23 +171,26 @@ try {
                 // Handle video file replacement if uploaded
                 if (!empty($_FILES['video_file']['name'])) {
                     $upload_dir = '../../uploads/videos/';
+                    $upload_dir_realpath = realpath($upload_dir);
+                    
                     if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+                    
+                    // Validate uploaded file MIME type
+                    $allowed_video_types = ['video/mp4', 'video/x-msvideo', 'video/quicktime', 'video/x-matroska'];
+                    $video_file = $_FILES['video_file'];
+                    
+                    if (!validate_file_type($video_file['tmp_name'], $allowed_video_types)) {
+                        throw new Exception('Invalid video file type. Only MP4, AVI, MOV, and MKV are allowed.');
+                    }
                     
                     // Delete old video file before uploading new one
                     if ($existing_video['video_path']) {
-                        $old_video_path = $upload_dir . $existing_video['video_path'];
-                        if (file_exists($old_video_path)) {
-                            if (unlink($old_video_path)) {
-                                error_log("Deleted old video: " . $existing_video['video_path']);
-                            } else {
-                                error_log("Failed to delete old video: " . $existing_video['video_path']);
-                            }
-                        }
+                        $old_video_path = $upload_dir . basename($existing_video['video_path']); // Prevent traversal
+                        safe_unlink($old_video_path, $upload_dir_realpath);
                     }
                     
-                    $video_file = $_FILES['video_file'];
                     $video_ext = pathinfo($video_file['name'], PATHINFO_EXTENSION);
-                    $video_filename = 'video_' . $module_id . '_' . time() . '.' . $video_ext;
+                    $video_filename = secure_filename('video_' . $module_id . '_' . time() . '.' . $video_ext);
                     $video_path = $upload_dir . $video_filename;
                     
                     if (move_uploaded_file($video_file['tmp_name'], $video_path)) {
@@ -175,18 +204,22 @@ try {
                 // Handle thumbnail replacement if uploaded
                 if (!empty($_FILES['thumbnail_file']['name'])) {
                     $thumbnail_dir = '../../uploads/thumbnails/';
+                    $thumbnail_dir_realpath = realpath($thumbnail_dir);
+                    
                     if (!is_dir($thumbnail_dir)) mkdir($thumbnail_dir, 0755, true);
+                    
+                    // Validate uploaded file MIME type
+                    $allowed_image_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    $thumbnail_file = $_FILES['thumbnail_file'];
+                    
+                    if (!validate_file_type($thumbnail_file['tmp_name'], $allowed_image_types)) {
+                        throw new Exception('Invalid thumbnail file type. Only JPEG, PNG, GIF, and WEBP are allowed.');
+                    }
                     
                     // Delete old thumbnail file before uploading new one
                     if ($existing_video['thumbnail_path']) {
-                        $old_thumb_path = $thumbnail_dir . $existing_video['thumbnail_path'];
-                        if (file_exists($old_thumb_path)) {
-                            if (unlink($old_thumb_path)) {
-                                error_log("Deleted old thumbnail: " . $existing_video['thumbnail_path']);
-                            } else {
-                                error_log("Failed to delete old thumbnail: " . $existing_video['thumbnail_path']);
-                            }
-                        }
+                        $old_thumb_path = $thumbnail_dir . basename($existing_video['thumbnail_path']); // Prevent traversal
+                        safe_unlink($old_thumb_path, $thumbnail_dir_realpath);
                     }
                     
                     $thumbnail_file = $_FILES['thumbnail_file'];
@@ -223,18 +256,19 @@ try {
             $stmt->execute([$module_id]);
             
             if ($paths = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                // Delete video file
-                if ($paths['video_path'] && file_exists('../../uploads/videos/' . $paths['video_path'])) {
-                    if (unlink('../../uploads/videos/' . $paths['video_path'])) {
-                        error_log("Deleted video: " . $paths['video_path']);
-                    }
+                $video_dir = realpath('../../uploads/videos/');
+                $thumbnail_dir = realpath('../../uploads/thumbnails/');
+                
+                // Delete video file with path validation
+                if ($paths['video_path']) {
+                    $video_path = '../../uploads/videos/' . basename($paths['video_path']);
+                    safe_unlink($video_path, $video_dir);
                 }
                 
-                // Delete thumbnail
-                if ($paths['thumbnail_path'] && file_exists('../../uploads/thumbnails/' . $paths['thumbnail_path'])) {
-                    if (unlink('../../uploads/thumbnails/' . $paths['thumbnail_path'])) {
-                        error_log("Deleted thumbnail: " . $paths['thumbnail_path']);
-                    }
+                // Delete thumbnail with path validation
+                if ($paths['thumbnail_path']) {
+                    $thumbnail_path = '../../uploads/thumbnails/' . basename($paths['thumbnail_path']);
+                    safe_unlink($thumbnail_path, $thumbnail_dir);
                 }
             }
             

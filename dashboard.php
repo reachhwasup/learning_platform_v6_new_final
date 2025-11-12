@@ -1,8 +1,6 @@
 <?php
-// Start session and output buffering
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+// Include core functions (starts session with secure configuration)
+require_once 'includes/functions.php';
 ob_start();
 
 $page_title = 'Information Security Awareness Training';

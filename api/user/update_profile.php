@@ -59,20 +59,39 @@ try {
         case 'change_picture':
             if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = '../../uploads/profile_pictures/';
+                $upload_dir_realpath = null;
+                
                 if (!is_dir($upload_dir)) {
                     if (!mkdir($upload_dir, 0755, true)) {
                         throw new Exception('Failed to create upload directory.');
                     }
                 }
+                
+                $upload_dir_realpath = realpath($upload_dir);
+                
+                // Validate uploaded file MIME type
+                $allowed_image_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validate_file_type($_FILES['profile_picture']['tmp_name'], $allowed_image_types)) {
+                    throw new Exception('Invalid file type. Only JPEG, PNG, GIF, and WEBP images are allowed.');
+                }
+                
+                // Validate file size (max 5MB)
+                $max_size = 5 * 1024 * 1024; // 5MB
+                if ($_FILES['profile_picture']['size'] > $max_size) {
+                    throw new Exception('File size too large. Maximum size is 5MB.');
+                }
 
                 $file_ext = pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION);
-                $file_name = 'user_' . $user_id . '_' . time() . '.' . $file_ext;
+                $file_name = secure_filename('user_' . $user_id . '_' . time() . '.' . $file_ext);
                 
                 $stmt_old = $pdo->prepare("SELECT profile_picture FROM users WHERE id = ?");
                 $stmt_old->execute([$user_id]);
                 $old_pic = $stmt_old->fetchColumn();
-                if ($old_pic && $old_pic !== 'default_avatar.png' && file_exists($upload_dir . $old_pic)) {
-                    unlink($upload_dir . $old_pic);
+                
+                // Delete old profile picture with path validation
+                if ($old_pic && $old_pic !== 'default_avatar.png') {
+                    $old_pic_path = $upload_dir . basename($old_pic); // Prevent traversal
+                    safe_unlink($old_pic_path, $upload_dir_realpath);
                 }
 
                 if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $upload_dir . $file_name)) {
@@ -85,7 +104,7 @@ try {
                     $response = [
                         'success' => true, 
                         'message' => 'Profile picture updated.',
-                        'new_path' => 'uploads/profile_pictures/' . $file_name
+                        'new_path' => 'uploads/profile_pictures/' . htmlspecialchars($file_name, ENT_QUOTES, 'UTF-8')
                     ];
                 } else {
                     throw new Exception('Failed to move uploaded file.');

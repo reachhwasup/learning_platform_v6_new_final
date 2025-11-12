@@ -17,6 +17,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Chart.js for graphs on the dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Alpine.js x-cloak directive - hide elements until Alpine is loaded */
+        [x-cloak] { display: none !important; }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -54,12 +58,15 @@
                                 'View User Progress' => '<svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>',
                                 'View Exam Details' => '<svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>'
                             ];
-                            $page_title_display = isset($page_title) ? $page_title : 'Dashboard';
-                            echo $page_icons[$page_title_display] ?? '<svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                            // Sanitize page_title before using as array key to prevent XSS
+                            $page_title_display = isset($page_title) ? htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8') : 'Dashboard';
+                            // Use the original unsanitized value for array lookup, but it's safe since we control the array keys
+                            $page_title_for_icon = isset($page_title) ? $page_title : 'Dashboard';
+                            echo $page_icons[$page_title_for_icon] ?? '<svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
                             ?>
                         </div>
                         <h1 class="text-2xl font-bold text-gray-900">
-                            <?= isset($page_title) ? htmlspecialchars($page_title) : 'Dashboard' ?>
+                            <?= $page_title_display ?>
                         </h1>
                     </div>
                     

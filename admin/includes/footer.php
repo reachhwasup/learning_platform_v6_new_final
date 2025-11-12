@@ -10,5 +10,8 @@
         </main>
     </div> <!-- Closes flex-1 flex-col -->
 </div> <!-- Closes flex h-screen -->
+
+<!-- Security Script - Prevent Code Inspection -->
+<script src="../assets/js/security.js?v=<?= time() ?>"></script>
 </body>
 </html>
