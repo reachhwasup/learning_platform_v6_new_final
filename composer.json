@@ -3,7 +3,7 @@
     "description": "Information Security Awareness Learning Platform.",
     "type": "project",
     "require": {
-        "phpoffice/phpspreadsheet": "^4.5"
+        "phpoffice/phpspreadsheet": "^2.3"
     },
     "authors": [
         {
