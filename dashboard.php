@@ -215,9 +215,9 @@ body.transitioning .module-row {
         <p class="text-base sm:text-lg lg:text-xl text-gray-100 font-medium">
             Welcome back, <?= htmlspecialchars($_SESSION['user_first_name'] ?? 'User') ?>! 🎓
         </p>
-        <p class="text-sm sm:text-base text-gray-200 mt-2 max-w-md mx-auto">
+        <!-- <p class="text-sm sm:text-base text-gray-200 mt-2 max-w-md mx-auto">
             Continue your learning journey and unlock your potential
-        </p>
+        </p> -->
     </div>
 </div>
 

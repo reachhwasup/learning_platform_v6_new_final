@@ -32,6 +32,7 @@ if (!isset($_POST['username']) || empty($_POST['username']) || !isset($_POST['pa
 
 $username = $_POST['username'];
 $password = $_POST['password'];
+$remember_me = true; // Always remember users for 30 days
 
 try {
     $sql = "SELECT id, password, role, first_name, last_name, staff_id, position, phone_number, department_id, status, failed_login_attempts, password_reset_required, profile_picture 
@@ -75,6 +76,31 @@ try {
         $_SESSION['logged_in_at'] = time();
         $_SESSION['password_reset_required'] = (bool)$user['password_reset_required'];
         $_SESSION['user_profile_picture'] = $user['profile_picture'];
+
+        // Handle Remember Me functionality
+        if ($remember_me) {
+            // Generate secure random token
+            $token = bin2hex(random_bytes(32));
+            $expires_at = date('Y-m-d H:i:s', strtotime('+30 days'));
+            
+            // Store token in database
+            $tokenSql = "INSERT INTO remember_tokens (user_id, token, expires_at) VALUES (:user_id, :token, :expires_at)";
+            $tokenStmt = $pdo->prepare($tokenSql);
+            $tokenStmt->execute([
+                'user_id' => $user['id'],
+                'token' => hash('sha256', $token),
+                'expires_at' => $expires_at
+            ]);
+            
+            // Set cookie (30 days)
+            setcookie('remember_token', $token, [
+                'expires' => strtotime('+30 days'),
+                'path' => '/',
+                'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+        }
 
         $response['success'] = true;
         $response['message'] = 'Login successful! Redirecting...';

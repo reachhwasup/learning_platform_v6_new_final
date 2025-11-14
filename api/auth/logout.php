@@ -14,6 +14,26 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // 2. Check if user is admin before destroying session
 $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+$userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+// 2.5. Clear remember me token if exists
+if (isset($_COOKIE['remember_token']) && $userId) {
+    require_once '../../includes/db_connect.php';
+    
+    try {
+        // Delete token from database
+        $token = $_COOKIE['remember_token'];
+        $hashed_token = hash('sha256', $token);
+        $sql = "DELETE FROM remember_tokens WHERE user_id = :user_id AND token = :token";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['user_id' => $userId, 'token' => $hashed_token]);
+    } catch (PDOException $e) {
+        error_log("Error clearing remember token: " . $e->getMessage());
+    }
+    
+    // Clear the cookie
+    setcookie('remember_token', '', time() - 3600, '/', '', isset($_SERVER['HTTPS']), true);
+}
 
 // 3. Unset all of the session variables.
 $_SESSION = array();

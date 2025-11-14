@@ -3,6 +3,9 @@
 // We can include functions to start the session for when the form is processed.
 require_once 'includes/functions.php';
 
+// Check for remember me cookie and auto-login
+check_remember_me();
+
 // If a user is already logged in, redirect them away from the login page.
 if (is_logged_in()) {
     // Redirect admins to their dashboard, users to theirs
@@ -345,7 +348,7 @@ if (is_logged_in()) {
                                             Password Reset Information
                                         </h3>
                                         <p class="text-sm text-blue-800 mb-3">
-                                            For security reasons, password resets must be handled by your system administrator.
+                                            For security reasons, Please contact to Information Security Team.
                                         </p>
                                         
                                         <!-- Contact Info -->
@@ -354,11 +357,11 @@ if (is_logged_in()) {
                                                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                                 </svg>
-                                                Contact Administrator:
+                                                Contact Information Security Team:
                                             </p>
                                             <div class="text-xs text-blue-800 space-y-1">
                                                 <!-- <p><strong>Email:</strong> admin@company.com</p> -->
-                                                <p><strong>Phone:</strong> +1 (555) 123-4567 ext. 1001</p>
+                                                <p><strong>Extension:</strong> 3018, 3001</p>
                                             </div>
                                         </div>
 

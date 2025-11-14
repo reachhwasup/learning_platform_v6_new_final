@@ -133,12 +133,94 @@ function validate_file_type($file_path, $allowed_types) {
 }
 
 /**
+ * Check and process remember me token for auto-login
+ * 
+ * @return bool True if user was auto-logged in, false otherwise
+ */
+function check_remember_me() {
+    // Skip if already logged in
+    if (isset($_SESSION['user_id'])) {
+        return false;
+    }
+    
+    // Randomly cleanup expired tokens (1% chance)
+    if (rand(1, 100) === 1) {
+        cleanup_expired_remember_tokens();
+    }
+    
+    // Check if remember token cookie exists
+    if (!isset($_COOKIE['remember_token'])) {
+        return false;
+    }
+    
+    require_once __DIR__ . '/db_connect.php';
+    
+    try {
+        $token = $_COOKIE['remember_token'];
+        $hashed_token = hash('sha256', $token);
+        
+        // Find valid token in database
+        $sql = "SELECT rt.user_id, u.role, u.first_name, u.last_name, u.staff_id, u.position, 
+                       u.phone_number, u.department_id, u.status, u.password_reset_required, u.profile_picture
+                FROM remember_tokens rt
+                JOIN users u ON rt.user_id = u.id
+                WHERE rt.token = :token 
+                AND rt.expires_at > NOW()
+                AND u.status = 'active'";
+        
+        $stmt = $GLOBALS['pdo']->prepare($sql);
+        $stmt->execute(['token' => $hashed_token]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result) {
+            // Valid token found - log user in
+            session_regenerate_id(true);
+            $_SESSION['user_id'] = $result['user_id'];
+            $_SESSION['user_role'] = $result['role'];
+            $_SESSION['user_first_name'] = $result['first_name'];
+            $_SESSION['user_last_name'] = $result['last_name'];
+            $_SESSION['user_staff_id'] = $result['staff_id'];
+            $_SESSION['user_position'] = $result['position'];
+            $_SESSION['user_phone_number'] = $result['phone_number'];
+            $_SESSION['user_department_id'] = $result['department_id'];
+            $_SESSION['logged_in_at'] = time();
+            $_SESSION['password_reset_required'] = (bool)$result['password_reset_required'];
+            $_SESSION['user_profile_picture'] = $result['profile_picture'];
+            $_SESSION['auto_logged_in'] = true;
+            
+            return true;
+        } else {
+            // Invalid or expired token - remove cookie
+            setcookie('remember_token', '', time() - 3600, '/', '', isset($_SERVER['HTTPS']), true);
+            return false;
+        }
+    } catch (PDOException $e) {
+        error_log("Remember me error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
  * Checks if a user is logged in.
  *
  * @return bool True if the user is logged in, false otherwise.
  */
 function is_logged_in() {
     return isset($_SESSION['user_id']);
+}
+
+/**
+ * Clean up expired remember me tokens (should be called periodically)
+ */
+function cleanup_expired_remember_tokens() {
+    require_once __DIR__ . '/db_connect.php';
+    
+    try {
+        $sql = "DELETE FROM remember_tokens WHERE expires_at < NOW()";
+        $GLOBALS['pdo']->exec($sql);
+    } catch (PDOException $e) {
+        error_log("Error cleaning up expired tokens: " . $e->getMessage());
+    }
 }
 
 /**

@@ -347,13 +347,39 @@ GROUP BY
 --    - Failed login tracking
 --    - Password history to prevent reuse
 --
+-- ============================================
+-- 8. REMEMBER TOKENS TABLE (Remember Me Feature)
+-- ============================================
+DROP TABLE IF EXISTS `remember_tokens`;
+CREATE TABLE `remember_tokens` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `token` (`token`),
+  KEY `idx_token` (`token`),
+  KEY `idx_user_expires` (`user_id`,`expires_at`),
+  CONSTRAINT `remember_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- DEPLOYMENT NOTES
+-- ============================================
+-- 
 -- 7. File uploads directory structure:
 --    /uploads/profile_pictures/  - User profile images
 --    /uploads/videos/            - Training video files
 --    /uploads/thumbnails/        - Video thumbnail images
 --    (Ensure proper permissions: chmod 775)
 --
--- 8. Remember to backup database regularly!
+-- 8. Remember Me Feature:
+--    - Tokens automatically expire after 30 days
+--    - Users are automatically remembered on login
+--    - Tokens are cleared on logout
+--
+-- 9. Remember to backup database regularly!
 --    mysqldump -u backup -p learning_platform | gzip > backup_$(date +%Y%m%d).sql.gz
 --
 -- ============================================
